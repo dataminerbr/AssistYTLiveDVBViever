@@ -1,5 +1,6 @@
 import sys
 import subprocess
+import winreg
 
 # Pega URL do stream usando yt-dlp
 def pegar_stream(url):
@@ -29,8 +30,13 @@ def pegar_stream(url):
 
 # Abre no DVBViewer
 def abrir_no_dvbviewer(url):
-    caminho_dvbviewer = r"C:\Program Files (x86)\DVBViewer\DVBViewer.exe"
-    subprocess.run(['start', '', caminho_dvbviewer, url], shell=True)
+    try:
+        chave = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\dvbviewer.exe")
+        caminho_dvbviewer, _ = winreg.QueryValueEx(chave, None)
+        winreg.CloseKey(chave)
+        subprocess.run([caminho_dvbviewer, url])
+    except Exception as e:
+        print("Erro ao localizar ou abrir DVBViewer:", e)
 
 
 def main():
